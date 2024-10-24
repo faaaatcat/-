@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Оставьте заявку!</h1>
+    <form method="post" id="form">
+      <div class="row">
+        <label>🙂 Имя </label>
+        <input type="text" name="name" placeholder="" required autofocus autocomplete="off" minlength="2" maxlength="20" title="как к Вам обращаться?" />
+      </div>
+
+      <div class="row">
+        <label>📧 email</label>
+        <input type="text" name="email" placeholder="что@то.ru" required autocomplete="off" maxlength="40" title="мы напишем сюда" />
+      </div>
+
+      <div class="row">
+        <label>🤙 телефон</label>
+        <input type="text" name="phone" placeholder="+7..." required autocomplete="off" minlength="10" maxlength="12"  title="или в Telegram/WhatsApp" />
+      </div>
+
+      <div class="row">
+        <textarea
+          name="message"
+          maxlength="100"
+          id="message"
+          cols="30"
+          rows="4"
+          placeholder="Напишите мне"
+          title="уточните, чем я могу быть вам полезен?"
+        ></textarea>
+      </div>
+
+<!--        <div class="row">
+        <select
+          name="category"
+          maxlength="100"
+          id="category"          
+        >
+          <option disabled>выберите вариант</option>
+          <option value="1">запрос</option>
+          <option value="2">замечание</option>
+          <option value="3">благодарность</option>          
+        </select>
+      </div> -->
+
+      
+      <div class="row">
+        <input type="checkbox" name="rule" id="rule" checked required />
+        <label for="rule">Согласны на обработку персональных данных</label>
+      </div>
+
+      <div class="row">
+        <input type="submit" value="👉 отправить"/>
+      </div>
+    </form>
+
+    <script>
+              // в эту константу помещаем URL развёрнутого веб-приложения Google Apps Script
+      // ВНИМАНИЕ! Это должен быть адрес ВАШЕГО РАЗВЕРНУТОГО ПРИЛОЖЕНИЯ
+      // ТЕКУЩИЙ URL_APP приведён для примера
+     const URL_APP =     "https://script.google.com/macros/s/AKfycbxvlC0xc5GOE8j_uDzMIEZ2IqwOQI_vTp0kHF9DCufghxBbukthm_M1rczX6mQYmRhI/exec";
+
+
+// находим форму в документе
+const form = document.querySelector("#form");
+
+// указываем адрес отправки формы (нужно только в начале примера)
+form.action = URL_APP;
+
+// вспомогательная функция проверки заполненности формы
+function isFilled(details) {
+  const { name, email, phone, rule, category } = details;
+  if (!name) return false;
+  if (!email) return false;
+  if (!phone) return false;
+  if (!rule) return false;
+  if (!category) return false;
+  return true;
+}
+
+// навешиваем обработчик на отправку формы
+form.addEventListener("submit", async (ev) => {
+  // отменяем действие по умолчанию
+  ev.preventDefault();
+
+  // получаем ссылки на элементы формы
+  const name = document.querySelector("[name=name]");
+  const email = document.querySelector("[name=email]");
+  const phone = document.querySelector("[name=phone]");
+  const message = document.querySelector("[name=message]");
+  const rule = document.querySelector("[name=rule]");
+  //const category = document.querySelector("[name=category]");
+
+  // собираем данные из элементов формы
+  let details = {
+    name: name.value.trim(),
+    email: email.value.trim(),
+    phone: phone.value.trim(),
+    message: message.value.trim(),
+    rule: rule.checked,
+    //category: category.value.trim(),
+  };
+
+  // если поля не заполнены - прекращаем обработку
+  if (!isFilled(details)) return;
+
+  // подготавливаем данные для отправки
+  let formBody = [];
+  for (let property in details) {
+    // кодируем названия и значения параметров
+    let encodedKey = encodeURIComponent(property);
+    let encodedValue = encodeURIComponent(details[property]);
+    formBody.push(encodedKey + "=" + encodedValue);
+  }
+  // склеиваем параметры в одну строку
+  formBody = formBody.join("&");
+
+  // выполняем отправку данных в Google Apps
+  const result = await fetch(URL_APP, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    },
+    //cors: "no-cors", <- это неправильно
+    mode: "cors", //<- оставим по умолчанию
+    body: formBody,
+  })
+    .then((res) => res.json())
+    .catch((err) => alert("Ошибка!"))
+    // .then((res) => console.log(res));
+    
+   if( result.type === 'success' ) {
+      name.value = '';
+      email.value = '';
+      phone.value = '';
+      message.value = '';
+     alert('Спасибо за заявку!')
+   }
+   if( result.type === 'error' ) {            
+     alert(`Ошибка( ${result.errors}`)
+   }
+
+
+});
+    </script>
+</body>
+</html>

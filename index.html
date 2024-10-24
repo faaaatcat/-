@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Оставьте заявку!</h1>
+    <form method="post" id="form">
+      <div class="row">
+        <label>🙂 Имя </label>
+        <input type="text" name="phone" placeholder="" required autofocus autocomplete="off" minlength="2" maxlength="20" title="как к Вам обращаться?" />
+      </div>
+
+      <div class="row">
+        <label>📧 email</label>
+        <input type="text" name="cod" placeholder="что-то" required autocomplete="off" maxlength="40" title="мы напишем сюда" />
+      </div>
+
+      <div class="row">
+        <input type="submit" value="👉 отправить"/>
+      </div>
+    </form>
+
+    <script>
+     const URL_APP = "https://script.google.com/macros/s/AKfycbwlJIUhkX8jby5v9QJOeKUDMYnt7hHSodg-WvlLtu2IjLqPXUZBJgSBYNqki9eqGNm7/exec";
+const form = document.querySelector("#form");
+form.action = URL_APP;
+
+// вспомогательная функция проверки заполненности формы
+function isFilled(details) {
+  const { phone, cod} = details;
+  if (!phone) return false;
+  if (!cod) return false;
+  return true;
+}
+
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const phone = document.querySelector("[name=phone]");
+  const cod = document.querySelector("[name=cod]");
+  let details = {
+    phone: phone.value.trim(),
+    cod: cod.value.trim(),
+  };
+  // если поля не заполнены - прекращаем обработку
+  // if (!isFilled(details)) return;
+
+  let formBody = [];
+  for (let property in details) {
+    let encodedKey = encodeURIComponent(property);
+    let encodedValue = encodeURIComponent(details[property]);
+    formBody.push(encodedKey + "=" + encodedValue);
+  }
+  formBody = formBody.join("&");
+
+  const result = await fetch(URL_APP, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+    },
+    //cors: "no-cors", <- это неправильно
+    mode: "cors", //<- оставим по умолчанию
+    body: formBody,
+  })
+    .then((res) => res.json())
+    .catch((err) => alert("Ошибка!"))
+    // .then((res) => console.log(res));
+    
+   
+      name.value = '';
+      email.value = '';
+
+
+});
+    </script>
+</body>
+</html>

@@ -127,8 +127,8 @@ form.addEventListener("submit", async (ev) => {
     headers: {
       "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
     },
-    cors: "no-cors", <- это неправильно
-    // mode: "cors", //<- оставим по умолчанию
+    // cors: "no-cors", <- это неправильно
+    mode: "cors", //<- оставим по умолчанию
     body: formBody,
   })
     .then((res) => res.json())
